@@ -10,12 +10,12 @@
 
 <!-- Animated Header -->
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,50:1a56db,100:10b981&height=220&section=header&text=RISC-V%20Resilience&fontSize=42&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=Pesquisa%20em%20Resiliência%20de%20Processadores%20RISC-V&descSize=18&descAlignY=55&descColor=94a3b8" width="100%" alt="RISC-V Resilience Header"/>
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0f172a,50:1a56db,100:10b981&height=220&section=header&text=Windows%2011&fontSize=42&fontColor=ffffff&animation=fadeIn&fontAlignY=35&desc=Manuten%C3%A7%C3%A3o%20de%20Computadores&descSize=18&descAlignY=55&descColor=94a3b8" width="100%" alt="Windows 11 Header"/>
 </p>
 
 ## Visão Geral
 
-Este repositório contém duas ferramentas em PowerShell para diagnosticar lentidão no Windows 11 e aplicar otimizações práticas em processos, inicialização automática e componentes opcionais do sistema.
+Este repositório contém três ferramentas em PowerShell para diagnosticar lentidão no Windows 11, aplicar otimizações práticas e remover recursos de IA introduzidos nas versões mais recentes do sistema.
 
 ## Ferramentas Disponíveis
 
@@ -82,25 +82,61 @@ O script pode:
 
 - **Desativar tarefas agendadas relacionadas a Widgets/Feeds**
 
+### `RemoveWindowsAi.ps1`
+
+Remove, desativa e oculta componentes de IA do Windows 11, com suporte a execução interativa e não interativa.
+
+O script pode:
+
+- **Desativar chaves de Registro e políticas**
+  - Copilot
+  - Recall
+  - Rewrite do Notepad
+  - integrações de IA em Edge, Paint e componentes relacionados
+
+- **Remover pacotes Appx e componentes protegidos**
+  - pacotes `Copilot`
+  - componentes `CoreAI`
+  - `WindowsWorkload.*`
+  - tarefas e artefatos relacionados ao Recall
+
+- **Instalar apps clássicos opcionais**
+  - `photoviewer`
+  - `mspaint`
+  - `snippingtool`
+  - `notepad`
+  - `photoslegacy`
+
+- **Manter limpeza após updates**
+  - usa `RemoveAI-UpdateCleanup.ps1`
+  - consome `RemoveWindowsAIPackage/`
+  - utiliza `ClassicApps/` quando disponível localmente
+
 ## Pré-Requisitos
 
 Antes de usar os scripts, verifique os seguintes pontos:
 
 - **PowerShell disponível**
   - O Windows 11 já inclui PowerShell por padrão.
+  - Para `RemoveWindowsAi.ps1`, use preferencialmente o Windows PowerShell 5.1.
 
 - **Permissões adequadas**
   - O script de diagnóstico pode ser executado em sessão comum.
   - O script de otimização funciona melhor com PowerShell aberto como administrador.
+  - O script `RemoveWindowsAi.ps1` deve ser executado como administrador.
 
 - **Política de execução**
   - Caso necessário, execute usando `-ExecutionPolicy Bypass` apenas para a sessão do comando.
 
-## Estrutura dos Arquivos
-
 ```text
 .
 ├── diagnostico-windows11.ps1
+├── Documentation.md
+├── OtherAIFeatures.md
+├── ClassicApps\
+├── RemoveAI-UpdateCleanup.ps1
+├── RemoveWindowsAi.ps1
+├── RemoveWindowsAIPackage\
 ├── otimizacao-windows11.ps1
 └── README.md
 ```
@@ -188,11 +224,37 @@ powershell -ExecutionPolicy Bypass -File .\diagnostico-windows11.ps1
 powershell -ExecutionPolicy Bypass -File .\otimizacao-windows11.ps1
 ```
 
+### Executar remoção de IA com interface
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\RemoveWindowsAi.ps1
+```
+
+### Executar remoção de IA em modo não interativo
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\RemoveWindowsAi.ps1 -nonInteractive -AllOptions
+```
+
+### Instalar apps clássicos pelo script de remoção de IA
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\RemoveWindowsAi.ps1 -nonInteractive -InstallClassicApps photoviewer,mspaint,snippingtool,notepad
+```
+
 ### Executar com parâmetros explícitos
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\otimizacao-windows11.ps1 -StopBackgroundApps -DisableStartupEntries -RemoveConsumerPackages -DisableWidgetsTasks
 ```
+
+## Documentação da Remoção de IA
+
+ - **Guia técnico**
+   - [`Documentation.md`](./Documentation.md)
+
+ - **Recursos adicionais não removíveis por script**
+   - [`OtherAIFeatures.md`](./OtherAIFeatures.md)
 
 ## Interpretação do Relatório
 
@@ -254,18 +316,18 @@ powershell -ExecutionPolicy Bypass -File .\otimizacao-windows11.ps1
 
 ### O relatório não aparece
 
-- **Verifique a pasta atual**
-  - O relatório é salvo no diretório de execução, salvo quando `-ReportPath` for informado.
+ - **Verifique a pasta atual**
+   - O relatório é salvo no diretório de execução, salvo quando `-ReportPath` for informado.
 
 ### Nem tudo foi removido
 
-- **Alguns componentes dependem de privilégio elevado**
-  - Reexecute o PowerShell como administrador.
+ - **Alguns componentes dependem de privilégio elevado**
+   - Reexecute o PowerShell como administrador.
 
 ### O computador continua lento
 
-- **Revise processos do IDE, sincronização e antivírus**
-  - Em muitos cenários, a lentidão está em aplicações abertas e não no Windows em si.
+ - **Revise processos do IDE, sincronização e antivírus**
+   - Em muitos cenários, a lentidão está em aplicações abertas e não no Windows em si.
 
 ## Melhorias Futuras Sugeridas
 
@@ -279,12 +341,15 @@ powershell -ExecutionPolicy Bypass -File .\otimizacao-windows11.ps1
 </p>
 
 ---
-**Resumo:** Tutorial em português para uso dos scripts de diagnóstico e otimização de desempenho do Windows 11 presentes neste repositório.
+ 
+**Resumo:** Guia principal em português para uso dos scripts de diagnóstico, otimização e remoção de recursos de IA no Windows 11 presentes neste repositório.
 **Data de Criação:** 2026-04-21
 **Autor:** Rapport GenerAtiva
-**Versão:** 1.0
+**Versão:** 1.2
 **Última Atualização:** 2026-04-21
 **Atualizado por:** Rapport GenerAtiva
 **Histórico de Alterações:**
 - 2026-04-21 - Criado por Rapport GenerAtiva - Versão 1.0
 - 2026-04-21 - Atualizado por Rapport GenerAtiva - Adicionado tutorial completo de uso das ferramentas PowerShell - Versão 1.0
+- 2026-04-21 - Atualizado por Rapport GenerAtiva - Ajustado o header para o projeto Windows 11 com subtítulo Manutenção de Computadores - Versão 1.1
+- 2026-04-21 - Atualizado por Rapport GenerAtiva - Integrada a ferramenta RemoveWindowsAi na documentação principal e na estrutura do repositório - Versão 1.2
